@@ -1,0 +1,90 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <style>
+        .thumb {
+            border: 1px solid #ddd; /* Gray border */
+            border-radius: 4px; /* Rounded border */
+            padding: 5px; /* Some padding */
+            width: 100px; /* Set a small width */
+            height: 100px; /* Set a small width */
+        }
+
+        /* Add a hover effect (blue shadow) */
+        .thumb:hover {
+            box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+        }
+    </style>
+<script>
+    window.onload = function () {
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+    };
+
+    function handleFileSelect(evt) {
+        var files = evt.target.files;
+
+        for (var i = 0, f; f = files[i]; i++) {
+            if (!f.type.match('image.*')) {
+                alert("Image only please....");
+                continue
+            }
+            var reader = new FileReader();
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    // Render thumbnail.
+                    var span = document.createElement('span');
+                    span.innerHTML = ['<img class="thumb" title="', escape(theFile.name), '" src="', e.target.result, '" />'].join('');
+                    document.getElementById('output').insertBefore(span, null);
+                };
+            })(f);
+
+            reader.readAsDataURL(f);
+        }
+    }
+</script>
+
+</head>
+<body>
+
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<div>
+    <form method="POST" enctype="multipart/form-data">
+        <table>
+            <tr><td>File to upload:</td><td><input id="files" type="file" name="files" multiple/></td></tr>
+            <tr><td></td><td><input id="form" type="submit" value="Upload"/></td></tr>
+        </table>
+    </form>
+</div>
+
+<div>
+    <form method="POST">
+        <table>
+            <tr><td>upload by base 64:</td><td><input type="text" name="imageBase64" /></td></tr>
+            <tr><td></td><td><input type="submit" value="Upload"/></td></tr>
+        </table>
+    </form>
+</div>
+
+<div>
+    <form method="POST">
+        <table>
+            <tr><td>upload by url:</td><td><input type="text" name="url" /></td></tr>
+            <tr><td></td><td><input type="submit" value="Upload"/></td></tr>
+        </table>
+    </form>
+</div>
+
+
+<div class="row">
+    <span id="output"></span>
+</div>
+
+<div class="row">
+    <span id="count"><h2 th:text="${count}"/></span>
+</div>
+
+</body>
+</html>
